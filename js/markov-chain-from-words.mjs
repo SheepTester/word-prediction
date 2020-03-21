@@ -3,15 +3,17 @@ import { digest, preferredCase } from './words-analyzer.mjs'
 
 const bound = '[bound]'
 
-export function markovChainFromWords (text) {
+export function markovChainFromWords (text, minUsage = 0) {
   const sentences = preferredCase(digest(text))
-  const wordTypes = new Set([bound])
+  const wordTypes = new Map()
+  wordTypes.set(bound, Infinity)
   for (const sentence of sentences) {
     for (const word of sentence) {
-      wordTypes.add(word)
+      wordTypes.set(word, (wordTypes.get(word) || 0) + 1)
     }
   }
-  const words = [...wordTypes]
+  const words = [...wordTypes.keys()]
+    .filter(word => wordTypes.get(word) >= minUsage)
   const chain = new Matrix(words.length, words.length)
   const boundIndex = words.indexOf(bound)
   for (const sentence of sentences) {
@@ -32,5 +34,8 @@ export function markovChainFromWords (text) {
     matrix.set(row, row, 1 / sum)
   }
   // console.log(chain.toString(), matrix.toString())
-  return matrix.multiply(chain)
+  return {
+    chain: matrix.multiply(chain),
+    words
+  }
 }

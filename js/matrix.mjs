@@ -39,7 +39,7 @@ export class Matrix {
       for (let col = 0; col < matrix.cols; col++) {
         const position = row * product.cols + col
         for (let i = 0; i < pairs; i++) {
-          product.data[position] += this.data[i * this.cols + col] * matrix.data[row * matrix.cols + i]
+          product.data[position] += this.data[row * this.cols + i] * matrix.data[i * matrix.cols + col]
         }
       }
     }
