@@ -13,22 +13,35 @@ export function digest (text) {
   //             ^ false negative
   return text
     .split(/\. |\?|!|\r?\n/)
-    .map(sentence =>
-      sentence
-        .split(/\s+/)
-        .map((word, i) => {
-          if (!word) return null
-          // Asssume the word isn't normally capitalized, so if it's the first word
-          // of a sentence, lowercase it.
-          if (i === 0 && isUpperCase(word[0])) {
-            word = word.toLowerCase()
+    .map(sentence => {
+      const words = sentence.split(/\s+/)
+      const processed = []
+      for (let i = 0; i < words.length; i++) {
+        const subwords = words[i].split(',')
+        for (let j = 0; j < subwords.length; j++) {
+          let word = subwords[j]
+          if (word) {
+            // Asssume the word isn't normally capitalized, so if it's the first word
+            // of a sentence, lowercase it.
+            if (i === 0 && j === 0 && isUpperCase(word[0])) {
+              word = word.toLowerCase()
+            }
+            if (/^(?:\d+\.?\d*|\d*\.\d+)$/.test(word)) {
+              processed.push('[number]')
+              continue
+            }
+            word = word.replace(/[^a-z]/gi, '')
+            if (word) {
+              processed.push(word)
+            }
           }
-          if (/^\d*\.\d*$/.test(word)) return '[number]'
-          word = word.replace(/[^a-z]/i, '')
-          if (word) return word
-          return null
-        })
-        .filter(word => word))
+          if (j !== 0) {
+            processed.push(',')
+          }
+        }
+      }
+      return processed
+    })
     .filter(sentence => sentence.length)
 }
 
