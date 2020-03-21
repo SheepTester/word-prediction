@@ -1,0 +1,18 @@
+{
+  "name": "word-prediction",
+  "version": "1.0.0",
+  "description": "Analysis project",
+  "scripts": {
+    "test": "standard --verbose | snazzy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SheepTester/word-prediction.git"
+  },
+  "author": "SheepTester",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SheepTester/word-prediction/issues"
+  },
+  "homepage": "https://github.com/SheepTester/word-prediction#readme"
+}
