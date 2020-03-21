@@ -74,11 +74,11 @@ export class Matrix {
     for (let row = 0; row < this.rows; row++) {
       string += row === 0 ? (this.rows === 1 ? brackets.open : brackets.openTop)
         : row === this.rows - 1 ? brackets.openBottom
-        : brackets.openMiddle
+          : brackets.openMiddle
       string += ' ' + this.data.slice(row * this.cols, (row + 1) * this.cols).join('\t') + ' '
       string += row === 0 ? (this.rows === 1 ? brackets.close : brackets.closeTop)
         : row === this.rows - 1 ? brackets.closeBottom
-        : brackets.closeMiddle
+          : brackets.closeMiddle
       string += '\n'
     }
     return string

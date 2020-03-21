@@ -45,7 +45,6 @@ export function digest (text) {
     .filter(sentence => sentence.length)
 }
 
-
 /**
  * "Chyme or chymus is the semi-fluid mass of partly digested food that is
  * expelled by the stomach"
