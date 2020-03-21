@@ -46,6 +46,29 @@ export class Matrix {
     return product
   }
 
+  transpose () {
+    const transpose = new Matrix(this.cols, this.rows)
+    for (let row = 0; row < this.rows; row++) {
+      for (let col = 0; col < this.cols; col++) {
+        transpose.data[col * transpose.cols + row] = this.data[row * this.cols + col]
+      }
+    }
+    return transpose
+  }
+
+  get (row, col) {
+    return this.data[row * this.cols + col]
+  }
+
+  set (row, col, value) {
+    this.data[row * this.cols + col] = value
+    return this
+  }
+
+  clone () {
+    return new Matrix(this.rows, this.cols, this.data)
+  }
+
   toString () {
     let string = '\n'
     for (let row = 0; row < this.rows; row++) {
@@ -59,5 +82,13 @@ export class Matrix {
       string += '\n'
     }
     return string
+  }
+
+  static identity (size) {
+    const identity = new this(size, size)
+    for (let i = 0; i < size; i++) {
+      identity.data[i * size + i] = 1
+    }
+    return identity
   }
 }
