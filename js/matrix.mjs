@@ -84,11 +84,21 @@ export class Matrix {
     return string
   }
 
+  toFile () {
+    return `${this.rows}x${this.cols}\n${this.data.join('\n')}`
+  }
+
   static identity (size) {
     const identity = new this(size, size)
     for (let i = 0; i < size; i++) {
       identity.data[i * size + i] = 1
     }
     return identity
+  }
+
+  static fromFile (file) {
+    const [dimensions, ...data] = file.split(/\r?\n/).filter(line => line)
+    const [, rows, cols] = dimensions.match(/(\d+)x(\d+)/)
+    return new Matrix(+rows, +cols, data.map(Number))
   }
 }

@@ -20,22 +20,30 @@ export function markovChainFromWords (text, minUsage = 0) {
     let lastIndex = boundIndex
     for (const word of sentence) {
       const index = words.indexOf(word)
+      if (index === -1) {
+        // Word is not used enough, so skip
+        continue
+      }
       chain.set(lastIndex, index, chain.get(lastIndex, index) + 1)
       lastIndex = index
     }
     chain.set(lastIndex, boundIndex, chain.get(lastIndex, boundIndex) + 1)
   }
-  const matrix = new Matrix(chain.rows, chain.cols)
+  return {
+    chain,
+    words
+  }
+}
+
+export function normalize (chain) {
   for (let row = 0; row < chain.rows; row++) {
     let sum = 0
     for (let col = 0; col < chain.cols; col++) {
       sum += chain.get(row, col)
     }
-    matrix.set(row, row, 1 / sum)
+    for (let col = 0; col < chain.cols; col++) {
+      chain.set(row, col, chain.get(row, col) / sum)
+    }
   }
-  // console.log(chain.toString(), matrix.toString())
-  return {
-    chain: matrix.multiply(chain),
-    words
-  }
+  return chain
 }
