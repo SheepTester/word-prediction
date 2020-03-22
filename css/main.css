@@ -3,6 +3,8 @@ body {
   height: 100%;
 }
 body {
+  display: flex;
+  flex-direction: column;
   margin: 0;
   font-size: 0;
   font-family: 'Merriweather', serif;
@@ -10,8 +12,25 @@ body {
   color: white;
 }
 .main {
+  flex: auto;
   display: flex;
 }
 .input-wrapper {
+  flex: auto;
   position: relative;
+}
+.input {
+  color: inherit;
+  font: inherit;
+  font-size: 16px;
+  -webkit-appearance: none;
+  border: none;
+  background: none;
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.input:focus {
+  outline: none;
 }
