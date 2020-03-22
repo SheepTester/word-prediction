@@ -1,0 +1,17 @@
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-size: 0;
+  font-family: 'Merriweather', serif;
+  background-color: #2f392f;
+  color: white;
+}
+.main {
+  display: flex;
+}
+.input-wrapper {
+  position: relative;
+}
