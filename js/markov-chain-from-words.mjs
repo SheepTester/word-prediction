@@ -14,7 +14,7 @@ export function markovChainFromWords (text, minUsage = 0) {
   }
   const words = [...wordTypes.keys()]
     .filter(word => wordTypes.get(word) >= minUsage)
-  const chain = new Matrix(words.length, words.length)
+  const matrix = new Matrix(words.length, words.length)
   const boundIndex = words.indexOf(bound)
   for (const sentence of sentences) {
     let lastIndex = boundIndex
@@ -24,13 +24,13 @@ export function markovChainFromWords (text, minUsage = 0) {
         // Word is not used enough, so skip
         continue
       }
-      chain.set(lastIndex, index, chain.get(lastIndex, index) + 1)
+      matrix.set(lastIndex, index, matrix.get(lastIndex, index) + 1)
       lastIndex = index
     }
-    chain.set(lastIndex, boundIndex, chain.get(lastIndex, boundIndex) + 1)
+    matrix.set(lastIndex, boundIndex, matrix.get(lastIndex, boundIndex) + 1)
   }
   return {
-    chain,
+    matrix,
     words
   }
 }
@@ -46,4 +46,31 @@ export function normalize (chain) {
     }
   }
   return chain
+}
+
+export function combine (...sets) {
+  const wordUnion = [...new Set([].concat(...sets.map(({ words }) => words)))]
+  const bigger = new Matrix(wordUnion.length, wordUnion.length)
+  const addMatrixDataFor = ({ matrix, words }) => {
+    for (let row = 0; row < matrix.rows; row++) {
+      for (let col = 0; col < matrix.cols; col++) {
+        const position = wordUnion.indexOf(words[row]) * bigger.cols + wordUnion.indexOf(words[col])
+        bigger.data[position] += matrix.data[row * matrix.cols + col]
+      }
+    }
+  }
+  sets.forEach(addMatrixDataFor)
+  return { matrix: bigger, words: wordUnion }
+}
+
+export function toFile ({ matrix, words }) {
+  return `${words.join('\n')}\n=\n${matrix.toFile()}`
+}
+
+export function fromFile (file) {
+  const [words, matrix] = file.split('=')
+  return {
+    matrix: Matrix.fromFile(matrix),
+    words: words.split(/\r?\n/).filter(word => word)
+  }
 }
