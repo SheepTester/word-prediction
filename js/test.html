@@ -8,7 +8,7 @@
     <script src="/sheep3.js" charset="utf-8"></script>
   </head>
   <body>
-    <p>Available globally: <code>Matrix</code>, <code>analyzement</code>, and <code>words</code>. Use console to play around.</p>
+    <p>Available globally: <code>Matrix</code>, <code>analyzement</code>, and <code>WordFrequencies</code>. Use console to play around.</p>
     <script type="module">
       import { Matrix } from './matrix.mjs'
       window.Matrix = Matrix
@@ -16,8 +16,8 @@
       import * as analyzement from './words-analyzer.mjs'
       window.analyzement = analyzement
 
-      import * as words from './markov-chain-from-words.mjs'
-      window.words = words
+      import * as WordFrequencies from './markov-chain-from-words.mjs'
+      window.WordFrequencies = WordFrequencies
     </script>
   </body>
 </html>
