@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Analysis project",
   "scripts": {
-    "build": "NODE_ENV=production webpack",
+    "build": "NODE_ENV=production webpack --colors",
     "start": "webpack-dev-server --open --colors",
     "test": "standard --verbose | snazzy"
   },
@@ -24,5 +24,10 @@
     "webpack": "^4.42.0",
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.10.3"
+  },
+  "standard": {
+    "ignore": [
+      "bundle.js"
+    ]
   }
 }
