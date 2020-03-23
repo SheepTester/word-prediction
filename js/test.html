@@ -10,13 +10,13 @@
   <body>
     <p>Available globally: <code>Matrix</code>, <code>analyzement</code>, and <code>WordFrequencies</code>. Use console to play around.</p>
     <script type="module">
-      import { Matrix } from './matrix.mjs'
+      import { Matrix } from './core/matrix.mjs'
       window.Matrix = Matrix
 
-      import * as analyzement from './words-analyzer.mjs'
+      import * as analyzement from './core/words-analyzer.mjs'
       window.analyzement = analyzement
 
-      import { WordFrequencies } from './word-frequencies.mjs'
+      import { WordFrequencies } from './core/word-frequencies.mjs'
       window.WordFrequencies = WordFrequencies
     </script>
   </body>

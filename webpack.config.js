@@ -4,7 +4,7 @@ const production = process.env.NODE_ENV === 'production'
 
 module.exports = {
   mode: production ? 'production' : 'development',
-  entry: './js/index.mjs',
+  entry: './js/browser/index.mjs',
   devtool: production ? false : 'inline-source-map',
   devServer: {
     contentBase: path.resolve(__dirname, '..'),

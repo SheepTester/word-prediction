@@ -1,5 +1,5 @@
 import getCaretCoordinates from 'textarea-caret'
-import { WordFrequencies } from './word-frequencies.mjs'
+import { WordFrequencies } from '../core/word-frequencies.mjs'
 
 const MAX_LIST_HEIGHT = 300
 const autocompleteList = document.getElementById('autocomplete')

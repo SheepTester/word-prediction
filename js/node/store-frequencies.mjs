@@ -2,12 +2,12 @@ import { promises as fs } from 'fs'
 import fetch from 'node-fetch'
 import path, { dirname } from 'path'
 import { fileURLToPath } from 'url'
-import { WordFrequencies } from './word-frequencies.mjs'
+import { WordFrequencies } from '../core/word-frequencies.mjs'
 
 // https://stackoverflow.com/a/50052194
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-const file = '../frequencies/bee-movie.txt'
+const file = '../../frequencies/bee-movie.txt'
 const source = 'https://gist.github.com/The5heepDev/a15539b297a7862af4f12ce07fee6bb7/raw/7164813a9b8d0a3b2dcffd5b80005f1967887475/entire_bee_movie_script'
 
 const filePath = path.resolve(__dirname, file)
