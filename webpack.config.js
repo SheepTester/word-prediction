@@ -8,7 +8,8 @@ module.exports = {
   devtool: production ? false : 'inline-source-map',
   devServer: {
     contentBase: path.resolve(__dirname, '..'),
-    openPage: '/word-prediction/'
+    publicPath: '/word-prediction/',
+    openPage: 'word-prediction/'
   },
   output: {
     path: __dirname,

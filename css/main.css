@@ -8,8 +8,10 @@ body {
   margin: 0;
   font-size: 0;
   font-family: 'Merriweather', serif;
+  line-height: 1.5;
   background-color: #2f392f;
   color: white;
+  overflow: hidden;
 }
 .main {
   flex: auto;
@@ -33,4 +35,19 @@ body {
 }
 .input:focus {
   outline: none;
+}
+.autocomplete-list {
+  background-color: #282828;
+  border-radius: 5px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  position: absolute;
+  box-sizing: border-box;
+  max-height: 300px;
+  width: 200px;
+  top: 0;
+  left: 0;
+}
+.hidden {
+  display: none;
 }
