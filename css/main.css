@@ -61,3 +61,8 @@ body {
   width: 300px;
   border-left: 1px solid rgba(255, 255, 255, 0.1);
 }
+.markov-vis-wrapper {
+  height: 300px;
+  position: relative;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}

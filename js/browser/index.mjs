@@ -1,5 +1,6 @@
 import getCaretCoordinates from 'textarea-caret'
 import { WordFrequencies } from '../core/word-frequencies.mjs'
+import { FrequencyRenderer } from './frequency-renderer.mjs'
 
 const MAX_LIST_HEIGHT = 300
 const autocompleteList = document.getElementById('autocomplete')
@@ -50,12 +51,20 @@ document.addEventListener('selectionchange', () => {
   }
 })
 
+const renderer = new FrequencyRenderer()
+renderer.addTo(document.getElementById('markov-vis'))
+renderer.resize()
 fetch('./frequencies/bee-movie.txt')
   .then(r => r.text())
   .then(WordFrequencies.fromFile)
   .then(frequencies => {
-    const key = frequencies.makeKey()
-    const words = frequencies.wordsByFrequency(true, key)
-    const chain = frequencies.markovChain()
-    // console.log(chain)
+    renderer.setFrequencies(frequencies)
+    renderer.render()
   })
+
+window.addEventListener('resize', e => {
+  let doneMeasuring
+  const promise = new Promise(resolve => doneMeasuring = resolve)
+  renderer.resize(promise)
+  doneMeasuring()
+})
