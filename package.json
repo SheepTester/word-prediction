@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/SheepTester/word-prediction#readme",
   "dependencies": {
+    "node-fetch": "^2.6.0",
     "textarea-caret": "^3.1.0"
   },
   "devDependencies": {

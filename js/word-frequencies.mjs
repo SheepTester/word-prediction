@@ -5,6 +5,7 @@ const bound = '[bound]'
 
 export class WordFrequencies {
   constructor (matrix, words) {
+    if (matrix.hasNaN()) throw new Error('NaN detected in matrix! >:(')
     this.matrix = matrix
     this.words = words
   }
@@ -27,8 +28,8 @@ export class WordFrequencies {
     return WordFrequencies.combine(this, ...sets)
   }
 
-  toFile ({ matrix, words }) {
-    return `${words.join('\n')}\n=\n${matrix.toFile()}`
+  toFile () {
+    return `${this.words.join('\n')}\n=\n${this.matrix.toFile()}`
   }
 
   static fromFile (file) {
@@ -72,10 +73,11 @@ export class WordFrequencies {
     const wordUnion = [...new Set([].concat(...sets.map(({ words }) => words)))]
     const bigger = new Matrix(wordUnion.length, wordUnion.length)
     const addMatrixDataFor = ({ matrix, words }) => {
+      const newIndices = new Map(words.map(word => [word, wordUnion.indexOf(word)]))
       for (let row = 0; row < matrix.rows; row++) {
         for (let col = 0; col < matrix.cols; col++) {
-          const position = wordUnion.indexOf(words[row]) * bigger.cols + wordUnion.indexOf(words[col])
-          bigger.data[position] += matrix.data[row * matrix.cols + col]
+          bigger.data[newIndices.get(words[row]) * bigger.cols + newIndices.get(words[col])] +=
+            matrix.data[row * matrix.cols + col]
         }
       }
     }

@@ -85,7 +85,31 @@ export class Matrix {
   }
 
   toFile () {
-    return `${this.rows}x${this.cols}\n${this.data.join('\n')}`
+    let file = `${this.rows}x${this.cols}`
+    let lastNum = null
+    let instances = 0
+    for (const num of this.data) {
+      if (num === lastNum) {
+        instances++
+      } else {
+        if (instances > 0) {
+          file += instances === 1 ? `\n${lastNum}` : `\n${lastNum}x${instances}`
+        }
+        lastNum = num
+        instances = 1
+      }
+    }
+    if (instances > 0) {
+      file += instances === 1 ? `\n${lastNum}` : `\n${lastNum}x${instances}`
+    }
+    return file
+  }
+
+  hasNaN () {
+    for (const num of this.data) {
+      if (Number.isNaN(num)) return true
+    }
+    return false
   }
 
   static identity (size) {
@@ -99,6 +123,16 @@ export class Matrix {
   static fromFile (file) {
     const [dimensions, ...data] = file.split(/\r?\n/).filter(line => line)
     const [, rows, cols] = dimensions.match(/(\d+)x(\d+)/)
-    return new Matrix(+rows, +cols, data.map(Number))
+    const matrix = new Matrix(+rows, +cols)
+    let i = 0
+    for (const line of data) {
+      const [, num, instances] = line.match(/(\d+)(?:x(\d+))?/)
+      const value = +num
+      const repetitions = instances ? +instances : 1
+      for (let j = 0; j < repetitions; i++, j++) {
+        matrix.data[i] = value
+      }
+    }
+    return matrix
   }
 }
