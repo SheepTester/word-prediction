@@ -9,7 +9,8 @@ body {
   font-size: 0;
   font-family: 'Merriweather', serif;
   line-height: 1.5;
-  background-color: #2f392f;
+  background-color: #403149;
+  background-image: linear-gradient(-30deg, #613c55, #403149);
   color: white;
   overflow: hidden;
 }
@@ -20,6 +21,7 @@ body {
 .input-wrapper {
   flex: auto;
   position: relative;
+  padding: 50px;
 }
 .input {
   color: inherit;
@@ -30,24 +32,32 @@ body {
   background: none;
   width: 100%;
   height: 100%;
-  padding: 20px;
+  padding: 40px;
   box-sizing: border-box;
+  background-color: #323232;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
 }
 .input:focus {
   outline: none;
 }
 .autocomplete-list {
-  background-color: #282828;
+  background-color: #404040;
   border-radius: 5px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
   padding: 20px;
-  position: absolute;
+  position: fixed;
   box-sizing: border-box;
   max-height: 300px;
   width: 200px;
   top: 0;
   left: 0;
+  resize: none;
 }
 .hidden {
   display: none;
+}
+.sidebar {
+  width: 300px;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
 }

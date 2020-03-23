@@ -9,24 +9,25 @@ function moveAutocomplete () {
     const windowWidth = window.innerWidth
     const windowHeight = window.innerHeight
     const scrollY = input.scrollTop
+    const { top: x, left: y } = input.getBoundingClientRect()
     const { width, height } = autocompleteList.getBoundingClientRect()
     const { top, left, height: cursorHeight } = getCaretCoordinates(input, input.selectionEnd)
-    if (left + width > windowWidth) {
+    if (x + left + width > windowWidth) {
       autocompleteList.style.left = windowWidth - width + 'px'
     } else {
-      autocompleteList.style.left = left + 'px'
+      autocompleteList.style.left = x + left + 'px'
     }
-    if (top - scrollY + cursorHeight + MAX_LIST_HEIGHT > windowHeight) {
-      if (top - MAX_LIST_HEIGHT < 0) {
+    if (y + top - scrollY + cursorHeight + MAX_LIST_HEIGHT > windowHeight) {
+      if (y + top - MAX_LIST_HEIGHT < 0) {
         // There's no room either way, so might as well squish below instead
-        autocompleteList.style.top = top - scrollY + cursorHeight + 'px'
-        autocompleteList.style.maxHeight = windowHeight - (top + cursorHeight + MAX_LIST_HEIGHT) + 'px'
+        autocompleteList.style.top = y + top - scrollY + cursorHeight + 'px'
+        autocompleteList.style.maxHeight = windowHeight - (y + top + cursorHeight + MAX_LIST_HEIGHT) + 'px'
       } else {
-        autocompleteList.style.top = top - scrollY - height + 'px'
+        autocompleteList.style.top = y + top - scrollY - height + 'px'
         autocompleteList.style.maxHeight = null
       }
     } else {
-      autocompleteList.style.top = top - scrollY + cursorHeight + 'px'
+      autocompleteList.style.top = y + top - scrollY + cursorHeight + 'px'
       autocompleteList.style.maxHeight = null
     }
   }
@@ -56,5 +57,5 @@ fetch('./frequencies/bee-movie.txt')
     const key = frequencies.makeKey()
     const words = frequencies.wordsByFrequency(true, key)
     const chain = frequencies.markovChain()
-    console.log(chain)
+    // console.log(chain)
   })
