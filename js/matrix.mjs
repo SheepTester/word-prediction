@@ -56,6 +56,18 @@ export class Matrix {
     return transpose
   }
 
+  rowSums () {
+    const sums = new Float32Array(this.rows)
+    for (let row = 0; row < this.rows; row++) {
+      let sum = 0
+      for (let col = 0; col < this.cols; col++) {
+        sum += this.data[row * this.cols + col]
+      }
+      sums[row] = sum
+    }
+    return sums
+  }
+
   get (row, col) {
     return this.data[row * this.cols + col]
   }

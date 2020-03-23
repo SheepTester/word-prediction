@@ -12,13 +12,10 @@ export class WordFrequencies {
 
   markovChain () {
     const chain = this.matrix.clone()
+    const sums = chain.rowSums()
     for (let row = 0; row < chain.rows; row++) {
-      let sum = 0
       for (let col = 0; col < chain.cols; col++) {
-        sum += chain.get(row, col)
-      }
-      for (let col = 0; col < chain.cols; col++) {
-        chain.set(row, col, chain.get(row, col) / sum)
+        chain.set(row, col, chain.get(row, col) / sums[row])
       }
     }
     return chain
@@ -26,6 +23,21 @@ export class WordFrequencies {
 
   combineWith (...sets) {
     return WordFrequencies.combine(this, ...sets)
+  }
+
+  makeKey () {
+    return new Map(this.words.map((word, i) => [word, i]))
+  }
+
+  wordsByFrequency (sorted = false, key = this.makeKey()) {
+    const sums = this.matrix.rowSums()
+    const words = this.words.map((word, i) => [word, sums[i]])
+    if (sorted) {
+      words.sort((a, b) => b[1] - a[1])
+    }
+    const map = new Map(words)
+    map.delete(bound)
+    return map
   }
 
   toFile () {

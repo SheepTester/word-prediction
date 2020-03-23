@@ -1,4 +1,5 @@
 import getCaretCoordinates from 'textarea-caret'
+import { WordFrequencies } from './word-frequencies.mjs'
 
 const MAX_LIST_HEIGHT = 300
 const autocompleteList = document.getElementById('autocomplete')
@@ -47,3 +48,13 @@ document.addEventListener('selectionchange', () => {
     moveAutocomplete()
   }
 })
+
+fetch('./frequencies/bee-movie.txt')
+  .then(r => r.text())
+  .then(WordFrequencies.fromFile)
+  .then(frequencies => {
+    const key = frequencies.makeKey()
+    const words = frequencies.wordsByFrequency(true, key)
+    const chain = frequencies.markovChain()
+    console.log(chain)
+  })
