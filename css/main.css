@@ -57,6 +57,7 @@ body {
   top: 0;
   left: 0;
   resize: none;
+  font-size: 16px;
 }
 .hidden {
   display: none;

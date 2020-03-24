@@ -23,27 +23,36 @@ function listPredictions () {
   if (!match) return
 
   const [, newSent, comma, word, number, progress] = match
-  let prevWord = null
+  let prevWord
   if (newSent) prevWord = BOUND
   else if (comma) prevWord = COMMA
-  else if (word && wordFrequencies) {
-    prevWord = wordFrequencies.words.find(properWord => properWord.toLowerCase() === word.toLowerCase()) || null
-  }
+  else if (word) prevWord = word
   else if (number) prevWord = NUMBER
-  if (!prevWord) return
+  else return
 
   if (prevPrevWord !== prevWord) {
-    const prevWordRow = key.get(prevWord)
+    let prevWordRow
+    if (word && wordFrequencies) {
+      const actualPrevWord = wordFrequencies.words.find(properWord =>
+        properWord.toLowerCase() === word.toLowerCase()) || null
+      prevWordRow = key.get(actualPrevWord)
+    } else {
+      prevWordRow = key.get(prevWord)
+    }
     if (prevWordRow) {
+      prevPrevWord = prevWord
+      prevWordSuggestions = []
       for (let col = 0; col < frequencies.matrix.cols; col++) {
         const freq = frequencies.matrix.get(prevWordRow, col)
         if (freq !== 0) {
-          autocomplete.push([frequencies.words[row], freq])
+          prevWordSuggestions.push([frequencies.words[row], freq])
         }
       }
-      // prevWordSuggestions
+      prevWordSuggestions.sort((a, b) => b[1] - a[1])
     }
   }
+
+  autocomplete = prevWordSuggestions.filter(([word]) => word.toLowerCase().startsWith(progress))
 }
 async function moveAutocomplete (then = Promise.resolve()) {
   if (!autocompleteList.classList.contains('hidden')) {
@@ -75,17 +84,20 @@ async function moveAutocomplete (then = Promise.resolve()) {
   }
 }
 input.addEventListener('input', e => {
-  if (input.selectionStart === input.selectionEnd) {
+  listPredictions()
+  if (autocomplete.length) {
     autocompleteList.classList.remove('hidden')
+    autocompleteList = autocomplete.join('\n') // TODO
   } else {
     autocompleteList.classList.add('hidden')
   }
-  moveAutocomplete()
+  // moveAutocomplete()
 })
 input.addEventListener('scroll', moveAutocomplete)
 document.addEventListener('selectionchange', () => {
   if (document.activeElement === input) {
     if (input.selectionStart !== input.selectionEnd) {
+      autocomplete = []
       autocompleteList.classList.add('hidden')
     }
     moveAutocomplete()
