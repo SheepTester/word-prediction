@@ -1,18 +1,59 @@
 import getCaretCoordinates from 'textarea-caret'
 import { WordFrequencies } from '../core/word-frequencies.mjs'
+import { NUMBER, COMMA, BOUND } from '../core/markers.mjs'
 import { FrequencyRenderer } from './frequency-renderer.mjs'
+
+let wordFrequencies, key, chain
 
 const MAX_LIST_HEIGHT = 300
 const autocompleteList = document.getElementById('autocomplete')
 const input = document.getElementById('input')
-function moveAutocomplete () {
+const typeProgressRegex = /(?:(^|\.|!|\?)|(,)|([a-z']+)\s|([0-9\.]+)\s)\s*([a-z']*)$/i
+let autocomplete
+let prevWord
+let prevWordSuggestions
+function listPredictions () {
+  autocomplete = []
+
+  if (input.selectionStart !== input.selectionEnd) return
+  if (!key && !chain) return
+
+  const beforeCursor = input.value.slice(0, input.selectionStart)
+  const match = beforeCursor.match(typeProgressRegex)
+  if (!match) return
+
+  const [, newSent, comma, word, number, progress] = match
+  let prevWord = null
+  if (newSent) prevWord = BOUND
+  else if (comma) prevWord = COMMA
+  else if (word && wordFrequencies) {
+    prevWord = wordFrequencies.words.find(properWord => properWord.toLowerCase() === word.toLowerCase()) || null
+  }
+  else if (number) prevWord = NUMBER
+  if (!prevWord) return
+
+  if (prevPrevWord !== prevWord) {
+    const prevWordRow = key.get(prevWord)
+    if (prevWordRow) {
+      for (let col = 0; col < frequencies.matrix.cols; col++) {
+        const freq = frequencies.matrix.get(prevWordRow, col)
+        if (freq !== 0) {
+          autocomplete.push([frequencies.words[row], freq])
+        }
+      }
+      // prevWordSuggestions
+    }
+  }
+}
+async function moveAutocomplete (then = Promise.resolve()) {
   if (!autocompleteList.classList.contains('hidden')) {
     const windowWidth = window.innerWidth
     const windowHeight = window.innerHeight
     const scrollY = input.scrollTop
-    const { top: x, left: y } = input.getBoundingClientRect()
+    const { left: x, top: y } = input.getBoundingClientRect()
     const { width, height } = autocompleteList.getBoundingClientRect()
     const { top, left, height: cursorHeight } = getCaretCoordinates(input, input.selectionEnd)
+    await then
     if (x + left + width > windowWidth) {
       autocompleteList.style.left = windowWidth - width + 'px'
     } else {
@@ -58,6 +99,9 @@ fetch('./frequencies/bee-movie.txt')
   .then(r => r.text())
   .then(WordFrequencies.fromFile)
   .then(frequencies => {
+    wordFrequencies = frequencies
+    key = frequencies.makeKey()
+    chain = frequencies.markovChain()
     renderer.setFrequencies(frequencies)
     renderer.render()
   })
@@ -66,5 +110,6 @@ window.addEventListener('resize', e => {
   let doneMeasuring
   const promise = new Promise(resolve => doneMeasuring = resolve)
   renderer.resize(promise)
+  moveAutocomplete(promise)
   doneMeasuring()
 })

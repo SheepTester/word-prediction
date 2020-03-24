@@ -1,7 +1,6 @@
 import { Matrix } from './matrix.mjs'
 import { digest, preferredCase } from './words-analyzer.mjs'
-
-const bound = '[bound]'
+import { BOUND } from './markers.mjs'
 
 export class WordFrequencies {
   constructor (matrix, words) {
@@ -36,7 +35,7 @@ export class WordFrequencies {
       words.sort((a, b) => b[1] - a[1])
     }
     const map = new Map(words)
-    map.delete(bound)
+    map.delete(BOUND)
     return map
   }
 
@@ -55,7 +54,7 @@ export class WordFrequencies {
   static fromWords (text, minUsage = 0) {
     const sentences = preferredCase(digest(text))
     const wordTypes = new Map()
-    wordTypes.set(bound, Infinity)
+    wordTypes.set(BOUND, Infinity)
     for (const sentence of sentences) {
       for (const word of sentence) {
         wordTypes.set(word, (wordTypes.get(word) || 0) + 1)
@@ -64,7 +63,7 @@ export class WordFrequencies {
     const words = [...wordTypes.keys()]
       .filter(word => wordTypes.get(word) >= minUsage)
     const matrix = new Matrix(words.length, words.length)
-    const boundIndex = words.indexOf(bound)
+    const boundIndex = words.indexOf(BOUND)
     for (const sentence of sentences) {
       let lastIndex = boundIndex
       for (const word of sentence) {

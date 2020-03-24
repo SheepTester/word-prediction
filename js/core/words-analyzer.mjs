@@ -1,3 +1,5 @@
+import { NUMBER, COMMA } from './markers.mjs'
+
 function isUpperCase (letter) {
   // Ignores accents oof
   return letter.toUpperCase() === letter && /[A-Z]/.test(letter)
@@ -27,7 +29,7 @@ export function digest (text) {
               word = word.toLowerCase()
             }
             if (/^(?:\d+\.?\d*|\d*\.\d+)$/.test(word)) {
-              processed.push('[number]')
+              processed.push(NUMBER)
               continue
             }
             word = word.replace(/[^a-z]/gi, '')
@@ -36,7 +38,7 @@ export function digest (text) {
             }
           }
           if (j !== 0) {
-            processed.push(',')
+            processed.push(COMMA)
           }
         }
       }

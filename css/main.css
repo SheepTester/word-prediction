@@ -17,10 +17,11 @@ body {
 .main {
   flex: auto;
   display: flex;
+  flex-wrap: wrap;
 }
 .input-wrapper {
   flex: auto;
-  position: relative;
+  flex-basis: 250px;
   padding: 50px;
 }
 .input {
@@ -37,6 +38,9 @@ body {
   background-color: #323232;
   border-radius: 10px;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+  max-width: 700px;
+  margin: 0 auto;
+  display: block;
 }
 .input:focus {
   outline: none;
@@ -59,10 +63,8 @@ body {
 }
 .sidebar {
   width: 300px;
-  border-left: 1px solid rgba(255, 255, 255, 0.1);
 }
 .markov-vis-wrapper {
   height: 300px;
   position: relative;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
