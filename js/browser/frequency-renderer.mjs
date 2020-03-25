@@ -48,7 +48,7 @@ export class FrequencyRenderer {
   setFrequencies (frequencies) {
     this.frequencies = frequencies
     this._key = frequencies.makeKey()
-    this._words = [...frequencies.wordsByFrequency(true, this._key).keys()]
+    this._words = [...frequencies.wordsByFrequency(true, this._key, false).keys()]
     this._chain = frequencies.markovChain()
 
     this._context.font = LABEL_FONT
@@ -97,12 +97,12 @@ export class FrequencyRenderer {
     const maxScroll = offset + this._words.length * CELL_SIZE
     if (this.scrollX < 0) {
       this.scrollX = 0
-    } else if (this.scrollX > maxScroll - this._width) {
+    } else if (this.scrollX > maxScroll - this._width && maxScroll > this._width) {
       this.scrollX = maxScroll - this._width
     }
     if (this.scrollY < 0) {
       this.scrollY = 0
-    } else if (this.scrollY > maxScroll - this._height) {
+    } else if (this.scrollY > maxScroll - this._height && maxScroll > this._height) {
       this.scrollY = maxScroll - this._height
     }
 

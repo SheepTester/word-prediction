@@ -28,14 +28,14 @@ export class WordFrequencies {
     return new Map(this.words.map((word, i) => [word, i]))
   }
 
-  wordsByFrequency (sorted = false, key = this.makeKey()) {
+  wordsByFrequency (sorted = false, key = this.makeKey(), removeBound = true) {
     const sums = this.matrix.rowSums()
     const words = this.words.map((word, i) => [word, sums[i]])
     if (sorted) {
       words.sort((a, b) => b[1] - a[1])
     }
     const map = new Map(words)
-    map.delete(BOUND)
+    if (removeBound) map.delete(BOUND)
     return map
   }
 
