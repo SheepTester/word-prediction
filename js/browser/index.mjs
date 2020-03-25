@@ -6,12 +6,15 @@ import { FrequencyRenderer } from './frequency-renderer.mjs'
 let wordFrequencies, key, chain
 
 const MAX_LIST_HEIGHT = 300
+const MAX_SUGGESTIONS = 5
 const autocompleteList = document.getElementById('autocomplete')
 const input = document.getElementById('input')
-const typeProgressRegex = /(?:(^|\.|!|\?)|(,)|([a-z']+)\s|([0-9\.]+)\s)\s*([a-z']*)$/i
-let autocomplete
-let prevWord
-let prevWordSuggestions
+const typeProgressRegex = /(?:(^|\.|!|\?)|(,)|([a-z']+)\s|([0-9\.]+)\s)\s*([a-z']*)$/im
+const getProgressRegex = /[a-z']*$/i
+const getProgressWithSpacesRegex = /\s*[a-z']*$/i
+let autocomplete = []
+let prevWord = null
+let prevWordSuggestions = []
 function listPredictions () {
   autocomplete = []
 
@@ -23,36 +26,123 @@ function listPredictions () {
   if (!match) return
 
   const [, newSent, comma, word, number, progress] = match
-  let prevWord
-  if (newSent) prevWord = BOUND
-  else if (comma) prevWord = COMMA
-  else if (word) prevWord = word
-  else if (number) prevWord = NUMBER
+  let currentPrevWord
+  if (newSent !== undefined) currentPrevWord = BOUND
+  else if (comma !== undefined) currentPrevWord = COMMA
+  else if (word !== undefined) currentPrevWord = word.toLowerCase()
+  else if (number !== undefined) currentPrevWord = NUMBER
   else return
 
-  if (prevPrevWord !== prevWord) {
-    let prevWordRow
+  if (currentPrevWord !== prevWord) {
+    let prevWordRow = null
     if (word && wordFrequencies) {
       const actualPrevWord = wordFrequencies.words.find(properWord =>
-        properWord.toLowerCase() === word.toLowerCase()) || null
+        properWord.toLowerCase() === currentPrevWord) || null
       prevWordRow = key.get(actualPrevWord)
     } else {
-      prevWordRow = key.get(prevWord)
+      prevWordRow = key.get(currentPrevWord)
     }
-    if (prevWordRow) {
-      prevPrevWord = prevWord
-      prevWordSuggestions = []
-      for (let col = 0; col < frequencies.matrix.cols; col++) {
-        const freq = frequencies.matrix.get(prevWordRow, col)
+    prevWordSuggestions = []
+    if (prevWordRow !== null) {
+      prevWord = currentPrevWord
+      for (let col = 0; col < chain.cols; col++) {
+        const freq = chain.get(prevWordRow, col)
         if (freq !== 0) {
-          prevWordSuggestions.push([frequencies.words[row], freq])
+          prevWordSuggestions.push([wordFrequencies.words[col], freq])
         }
       }
       prevWordSuggestions.sort((a, b) => b[1] - a[1])
     }
   }
 
-  autocomplete = prevWordSuggestions.filter(([word]) => word.toLowerCase().startsWith(progress))
+  autocomplete = prevWordSuggestions.filter(([word]) => word.toLowerCase().startsWith(progress.toLowerCase()))
+}
+let lastEntries
+let selected = null
+function renderAutocomplete () {
+  if (autocomplete.length) {
+    autocompleteList.classList.remove('hidden')
+
+    const entries = autocomplete.slice(0, MAX_SUGGESTIONS)
+    const entriesString = JSON.stringify(entries)
+    if (lastEntries === entriesString) return
+    lastEntries = entriesString
+    selected = null
+
+    autocompleteList.innerHTML = ''
+    for (let i = 0; i < entries.length; i++) {
+      const [word, freq] = entries[i]
+      if (word === NUMBER) continue
+
+      const elem = document.createElement('div')
+      elem.className = 'autocomplete-item'
+      elem.dataset.i = i
+      autocompleteList.appendChild(elem)
+
+      const wordElem = document.createElement('span')
+      wordElem.className = 'autocomplete-word'
+      switch (word) {
+        case COMMA:
+          wordElem.textContent = ','
+          break
+        case BOUND:
+          wordElem.textContent = '.'
+          break
+        default:
+          wordElem.textContent = word
+      }
+      elem.appendChild(wordElem)
+
+      elem.appendChild(document.createTextNode(' '))
+
+      const freqElem = document.createElement('span')
+      freqElem.className = 'autocomplete-frequency'
+      freqElem.textContent = (freq * 100).toFixed(2) + '%'
+      elem.appendChild(freqElem)
+    }
+  } else {
+    autocompleteList.classList.add('hidden')
+    selected = null
+  }
+}
+function setSelected (newSelected) {
+  if (!autocompleteList.children.length) return
+  if (selected !== null) {
+    const oldSelected = autocompleteList.children[selected]
+    oldSelected.classList.remove('selected')
+  }
+  newSelected = (newSelected + autocompleteList.children.length) % autocompleteList.children.length
+  selected = newSelected
+  const entry = autocompleteList.children[selected]
+  entry.classList.add('selected')
+}
+function autocompleteSelected () {
+  if (selected !== null) {
+    const beforeCursor = input.value.slice(0, input.selectionStart)
+    const [option] = autocomplete[selected]
+    const selection = option === COMMA || option === BOUND
+      ? beforeCursor.match(getProgressWithSpacesRegex)
+      : beforeCursor.match(getProgressRegex)
+    if (!selection) {
+      return
+    }
+    input.selectionStart = selection.index
+    let insert
+    switch (option) {
+      case NUMBER:
+        insert = Math.floor(Math.random() * 10000) + ' '
+        break
+      case COMMA:
+        insert = ', '
+        break
+      case BOUND:
+        insert = '. '
+        break
+      default:
+        insert = option + ' '
+    }
+    document.execCommand('insertText', false, insert)
+  }
 }
 async function moveAutocomplete (then = Promise.resolve()) {
   if (!autocompleteList.classList.contains('hidden')) {
@@ -85,22 +175,46 @@ async function moveAutocomplete (then = Promise.resolve()) {
 }
 input.addEventListener('input', e => {
   listPredictions()
-  if (autocomplete.length) {
-    autocompleteList.classList.remove('hidden')
-    autocompleteList = autocomplete.join('\n') // TODO
-  } else {
-    autocompleteList.classList.add('hidden')
-  }
-  // moveAutocomplete()
+  renderAutocomplete()
+  moveAutocomplete()
 })
 input.addEventListener('scroll', moveAutocomplete)
 document.addEventListener('selectionchange', () => {
   if (document.activeElement === input) {
-    if (input.selectionStart !== input.selectionEnd) {
-      autocomplete = []
-      autocompleteList.classList.add('hidden')
-    }
+    listPredictions()
+    renderAutocomplete()
     moveAutocomplete()
+  }
+})
+document.addEventListener('keydown', e => {
+  if (autocomplete.length) {
+    if (e.key === 'ArrowDown') {
+      if (selected === null) {
+        setSelected(0)
+      } else {
+        setSelected(selected + 1)
+      }
+    } else if (e.key === 'ArrowUp') {
+      if (selected === null) {
+        setSelected(-1)
+      } else {
+        setSelected(selected - 1)
+      }
+    } else if (e.key === 'Tab') {
+      autocompleteSelected()
+    } else {
+      return
+    }
+    e.preventDefault()
+  }
+})
+autocompleteList.addEventListener('click', e => {
+  const item = e.target.closest('.autocomplete-item')
+  if (item) {
+    input.focus()
+    setSelected(+item.dataset.i)
+    autocompleteSelected()
+    e.preventDefault()
   }
 })
 
