@@ -7,13 +7,22 @@ import { WordFrequencies } from '../core/word-frequencies.mjs'
 // https://stackoverflow.com/a/50052194
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-const file = '../../frequencies/bee-movie.txt'
-const source = 'https://gist.github.com/The5heepDev/a15539b297a7862af4f12ce07fee6bb7/raw/7164813a9b8d0a3b2dcffd5b80005f1967887475/entire_bee_movie_script'
+const file = '../../frequencies/gatm.txt'
+
+// const source = 'https://gist.github.com/The5heepDev/a15539b297a7862af4f12ce07fee6bb7/raw/7164813a9b8d0a3b2dcffd5b80005f1967887475/entire_bee_movie_script'
+// const fromOnline = true
+
+const source = '../../../../test/gatm/gatm.txt'
+const fromOnline = false
 
 const filePath = path.resolve(__dirname, file)
 
-fetch(source)
-  .then(r => r.text())
+const sourcePromise = fromOnline
+  ? fetch(source)
+    .then(r => r.text())
+  : fs.readFile(path.resolve(__dirname, source), 'utf8')
+
+sourcePromise
   .then(text => {
     console.log('Text retrieved')
     const frequencies = WordFrequencies.fromWords(text)

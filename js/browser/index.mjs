@@ -47,13 +47,14 @@ function listPredictions () {
     if (prevWordRow !== undefined) {
       prevWord = currentPrevWord
       for (let col = 0; col < chain.cols; col++) {
+        const word = wordFrequencies.words[col]
         const freq = chain.get(prevWordRow, col)
-        if (freq !== 0) {
+        if (freq !== 0 && word !== NUMBER) {
           prevWordSuggestions.push([
             prevWord === BOUND
               // Capitalize sentences
-              ? capitalize(wordFrequencies.words[col])
-              : wordFrequencies.words[col],
+              ? capitalize(word)
+              : word,
             freq
           ])
         }
@@ -271,17 +272,23 @@ autoGenBtn.addEventListener('click', e => {
 const renderer = new FrequencyRenderer()
 renderer.addTo(document.getElementById('markov-vis'))
 renderer.resize()
-fetch('./frequencies/bee-movie.txt')
-  .then(r => r.text())
-  .then(WordFrequencies.fromFile)
-  .then(frequencies => {
-    wordFrequencies = frequencies
-    key = frequencies.makeKey()
-    chain = frequencies.markovChain()
-    renderer.setFrequencies(frequencies)
-    renderer.render()
-    updateAutocomplete()
-  })
+
+function loadFrequencies (url) {
+  return fetch(url)
+    .then(r => r.text())
+    .then(WordFrequencies.fromFile)
+    .then(frequencies => {
+      wordFrequencies = frequencies
+      key = frequencies.makeKey()
+      chain = frequencies.markovChain()
+      renderer.setFrequencies(frequencies)
+      renderer.render()
+      updateAutocomplete()
+    })
+}
+
+// loadFrequencies('./frequencies/bee-movie.txt')
+loadFrequencies('./frequencies/gatm.txt')
 
 window.addEventListener('resize', e => {
   let doneMeasuring
