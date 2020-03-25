@@ -7,7 +7,7 @@ import { FrequencyRenderer } from './frequency-renderer.mjs'
 let wordFrequencies, key, chain
 
 const MAX_LIST_HEIGHT = 300
-const MAX_SUGGESTIONS = 5
+const MAX_SUGGESTIONS = 10
 const autocompleteList = document.getElementById('autocomplete')
 const input = document.getElementById('input')
 const typeProgressRegex = /(?:(^|\.|!|\?|\n)|(,)|([a-z']+)[ \t]|([0-9\.]+)[ \t])[ \t]*([a-z']*)$/i
@@ -122,6 +122,11 @@ function setSelected (newSelected) {
   selected = newSelected
   const entry = autocompleteList.children[selected]
   entry.classList.add('selected')
+  if (entry.scrollIntoViewIfNeeded) {
+    entry.scrollIntoViewIfNeeded()
+  } else {
+    entry.scrollIntoView()
+  }
 }
 function autocompleteSelected () {
   if (selected !== null) {
@@ -187,6 +192,7 @@ function updateAutocomplete () {
 }
 input.addEventListener('input', updateAutocomplete)
 input.addEventListener('scroll', moveAutocomplete)
+document.addEventListener('scroll', moveAutocomplete)
 document.addEventListener('selectionchange', e => {
   if (document.activeElement === input) {
     updateAutocomplete()
@@ -221,6 +227,44 @@ autocompleteList.addEventListener('click', e => {
     setSelected(+item.dataset.i)
     autocompleteSelected()
     e.preventDefault()
+  }
+})
+
+const autoGenBtn = document.getElementById('random')
+let generating = false
+let generateID = null
+function generate () {
+  if (autocomplete && document.activeElement === input) {
+    const max = autocomplete.reduce((acc, curr) => acc + curr[1], 0)
+    let random = Math.random() * max
+    for (let i = 0; i < autocomplete.length; i++) {
+      random -= autocomplete[i][1]
+      // If `random` < freq
+      if (random < 0) {
+        setSelected(i)
+        break
+      }
+    }
+    autocompleteSelected()
+  }
+
+  if (generating) {
+    generateID = setTimeout(generate, 50)
+  }
+}
+autoGenBtn.addEventListener('click', e => {
+  input.focus()
+  if (generating) {
+    generating = false
+    if (generateID !== null) {
+      clearTimeout(generateID)
+      generateID = null
+    }
+    autoGenBtn.textContent = 'Generate randomly'
+  } else {
+    generating = true
+    generate()
+    autoGenBtn.textContent = 'Stop generating'
   }
 })
 

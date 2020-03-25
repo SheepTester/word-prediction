@@ -29,6 +29,7 @@ export class FrequencyRenderer {
     })
     this.canvas.addEventListener('pointermove', e => {
       if (scrollPointer === e.pointerId) {
+        // NOTE: At least on Chrome, movementX/Y is affected by devicePixelRatio
         this.scrollX -= e.movementX
         this.scrollY -= e.movementY
         this.render()
