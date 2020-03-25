@@ -3,6 +3,7 @@ const CELL_PADDING = 2
 const LABEL_PADDING = 5
 const LABEL_FONT = '10px "Merriweather", serif'
 const FREQ_FONT = '10px "Merriweather", serif'
+const INIT_SCROLL_OFFSET = 70
 
 export class FrequencyRenderer {
   constructor () {
@@ -57,6 +58,8 @@ export class FrequencyRenderer {
       if (width > maxWidth) maxWidth = width
     }
     this._maxWidth = maxWidth
+    this.scrollX = this._maxWidth + 2 * LABEL_PADDING - INIT_SCROLL_OFFSET
+    this.scrollY = this._maxWidth + 2 * LABEL_PADDING - INIT_SCROLL_OFFSET
   }
 
   addTo (elem) {
