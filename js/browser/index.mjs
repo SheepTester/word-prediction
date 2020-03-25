@@ -10,9 +10,9 @@ const MAX_LIST_HEIGHT = 300
 const MAX_SUGGESTIONS = 5
 const autocompleteList = document.getElementById('autocomplete')
 const input = document.getElementById('input')
-const typeProgressRegex = /(?:(^|\.|!|\?)|(,)|([a-z']+)\s|([0-9\.]+)\s)\s*([a-z']*)$/im
+const typeProgressRegex = /(?:(^|\.|!|\?|\n)|(,)|([a-z']+)[ \t]|([0-9\.]+)[ \t])[ \t]*([a-z']*)$/i
 const getProgressRegex = /[a-z']*$/i
-const getProgressWithSpacesRegex = /\s*[a-z']*$/i
+const getProgressWithSpacesRegex = /[ \t]*[a-z']*$/i
 let autocomplete = []
 let prevWord = null
 let prevWordSuggestions = []
@@ -35,16 +35,16 @@ function listPredictions () {
   else return
 
   if (currentPrevWord !== prevWord) {
-    let prevWordRow = null
+    let prevWordRow
     if (word && wordFrequencies) {
       const actualPrevWord = wordFrequencies.words.find(properWord =>
-        properWord.toLowerCase() === currentPrevWord) || null
+        properWord.toLowerCase() === currentPrevWord)
       prevWordRow = key.get(actualPrevWord)
     } else {
       prevWordRow = key.get(currentPrevWord)
     }
     prevWordSuggestions = []
-    if (prevWordRow !== null) {
+    if (prevWordRow !== undefined) {
       prevWord = currentPrevWord
       for (let col = 0; col < chain.cols; col++) {
         const freq = chain.get(prevWordRow, col)
@@ -180,17 +180,16 @@ async function moveAutocomplete (then = Promise.resolve()) {
     }
   }
 }
-input.addEventListener('input', e => {
+function updateAutocomplete () {
   listPredictions()
   renderAutocomplete()
   moveAutocomplete()
-})
+}
+input.addEventListener('input', updateAutocomplete)
 input.addEventListener('scroll', moveAutocomplete)
-document.addEventListener('selectionchange', () => {
+document.addEventListener('selectionchange', e => {
   if (document.activeElement === input) {
-    listPredictions()
-    renderAutocomplete()
-    moveAutocomplete()
+    updateAutocomplete()
   }
 })
 document.addEventListener('keydown', e => {
@@ -237,6 +236,7 @@ fetch('./frequencies/bee-movie.txt')
     chain = frequencies.markovChain()
     renderer.setFrequencies(frequencies)
     renderer.render()
+    updateAutocomplete()
   })
 
 window.addEventListener('resize', e => {
