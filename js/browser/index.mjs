@@ -1,6 +1,7 @@
 import getCaretCoordinates from 'textarea-caret'
 import { WordFrequencies } from '../core/word-frequencies.mjs'
 import { NUMBER, COMMA, BOUND } from '../core/markers.mjs'
+import { capitalize } from '../core/capitalize.mjs'
 import { FrequencyRenderer } from './frequency-renderer.mjs'
 
 let wordFrequencies, key, chain
@@ -48,7 +49,13 @@ function listPredictions () {
       for (let col = 0; col < chain.cols; col++) {
         const freq = chain.get(prevWordRow, col)
         if (freq !== 0) {
-          prevWordSuggestions.push([wordFrequencies.words[col], freq])
+          prevWordSuggestions.push([
+            prevWord === BOUND
+              // Capitalize sentences
+              ? capitalize(wordFrequencies.words[col])
+              : wordFrequencies.words[col],
+            freq
+          ])
         }
       }
       prevWordSuggestions.sort((a, b) => b[1] - a[1])

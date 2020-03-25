@@ -32,7 +32,7 @@ export function digest (text) {
               processed.push(NUMBER)
               continue
             }
-            word = word.replace(/[^a-z]/gi, '')
+            word = word.replace(/[^a-z']/gi, '')
             if (word) {
               processed.push(word)
             }
