@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>movementX/Y with devicePixelRatio =/= 1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" href="/sheep3.css">
+    <script src="/sheep3.js" charset="utf-8"></script>
+    <style>
+      body {
+        touch-action: none;
+      }
+      .ball {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 30px;
+        height: 30px;
+        background-color: black;
+        border-radius: 50%;
+      }
+    </style>
+  </head>
+  <body>
+    <p>Might have to zoom in/out to change devicePixelRatio</p>
+    <script>
+const ball = document.createElement('div')
+ball.className = 'ball'
+document.body.appendChild(ball)
+let x = 0
+let y = 0
+let pointer = null
+document.addEventListener('pointerdown', e => {
+  if (pointer === null) {
+    pointer = e.pointerId
+  }
+})
+document.addEventListener('pointermove', e => {
+  if (pointer === e.pointerId) {
+    x += e.movementX
+    y += e.movementY
+    ball.style.left = `${x}px`
+    ball.style.top = `${y}px`
+  }
+})
+const pointerend = e => {
+  if (pointer === e.pointerId) {
+    pointer = null
+  }
+}
+document.addEventListener('pointerup', pointerend)
+document.addEventListener('pointercancel', pointerend)
+    </script>
+  </body>
+</html>
