@@ -103,3 +103,8 @@ textarea {
   width: 100%;
   background-image: linear-gradient(-30deg, #b647c5, #c54649, #c57b46);
 }
+
+:disabled {
+  opacity: 0.5;
+  cursor: auto;
+}
