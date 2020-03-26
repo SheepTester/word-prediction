@@ -21,24 +21,29 @@ export class FrequencyRenderer {
       this.render()
     }, { passive: false })
 
-    let scrollPointer = null
+    let scroll = null
     this.canvas.addEventListener('pointerdown', e => {
-      if (scrollPointer === null) {
-        scrollPointer = e.pointerId
-        this.canvas.setPointerCapture(scrollPointer)
+      if (scroll === null) {
+        scroll = {
+          pointer: e.pointerId,
+          initScrollX: this.scrollX,
+          initScrollY: this.scrollY,
+          initMouseX: e.clientX,
+          initMouseY: e.clientY
+        }
+        this.canvas.setPointerCapture(scroll.pointer)
       }
     })
     this.canvas.addEventListener('pointermove', e => {
-      if (scrollPointer === e.pointerId) {
-        // NOTE: At least on Chrome, movementX/Y is affected by devicePixelRatio
-        this.scrollX -= e.movementX
-        this.scrollY -= e.movementY
+      if (scroll && scroll.pointer === e.pointerId) {
+        this.scrollX = scroll.initMouseX - e.clientX + scroll.initScrollX
+        this.scrollY = scroll.initMouseY - e.clientY + scroll.initScrollY
         this.render()
       }
     })
     const pointerend = e => {
-      if (scrollPointer === e.pointerId) {
-        scrollPointer = null
+      if (scroll && scroll.pointer === e.pointerId) {
+        scroll = null
       }
     }
     this.canvas.addEventListener('pointerup', pointerend)
