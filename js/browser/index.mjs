@@ -3,6 +3,7 @@ import { WordFrequencies } from '../core/word-frequencies.mjs'
 import { NUMBER, COMMA, BOUND } from '../core/markers.mjs'
 import { capitalize } from '../core/capitalize.mjs'
 import { FrequencyRenderer } from './frequency-renderer.mjs'
+import './focus-visible.mjs'
 
 let wordFrequencies, key, chain
 
@@ -276,31 +277,38 @@ const renderer = new FrequencyRenderer()
 renderer.addTo(document.getElementById('markov-vis'))
 renderer.resize()
 
+function useFrequencies (frequencies) {
+  wordFrequencies = frequencies
+  key = frequencies.makeKey()
+  chain = frequencies.markovChain()
+
+  renderer.setFrequencies(frequencies)
+  renderer.render()
+
+  prevWord = null
+  prevWordSuggestions = []
+  updateAutocomplete()
+}
+
 function loadFrequencies (url) {
   return fetch(url)
     .then(r => r.text())
     .then(WordFrequencies.fromFile)
-    .then(frequencies => {
-      wordFrequencies = frequencies
-      key = frequencies.makeKey()
-      chain = frequencies.markovChain()
-
-      renderer.setFrequencies(frequencies)
-      renderer.render()
-
-      prevWord = null
-      prevWordSuggestions = []
-      updateAutocomplete()
-    })
+    .then(useFrequencies)
 }
 
+const customSource = '[CUSTOM]'
 const sources = [
   { url: './frequencies/peter-piper.txt', name: 'Peter Piper' },
   { url: './frequencies/winston.txt', name: 'Down with Big Brother' },
   { url: './frequencies/bee-movie.txt', name: 'Bee Movie' },
-  { url: './frequencies/gatm.txt', name: 'A Geometric Approach to Matrices' }
+  { url: './frequencies/gatm.txt', name: 'A Geometric Approach to Matrices' },
+  { url: customSource, name: 'Custom' }
 ]
 const defaultSource = './frequencies/bee-movie.txt'
+const customSourceWrapper = document.getElementById('source-wrapper')
+const customSourceText = document.getElementById('source-text')
+const customSourceBtn = document.getElementById('use-source')
 const sourceSelect = document.getElementById('source')
 for (const { url, name } of sources) {
   const option = document.createElement('option')
@@ -309,7 +317,15 @@ for (const { url, name } of sources) {
   sourceSelect.appendChild(option)
 }
 sourceSelect.addEventListener('change', e => {
-  loadFrequencies(sourceSelect.value)
+  if (sourceSelect.value === customSource) {
+    customSourceWrapper.classList.remove('hidden')
+  } else {
+    loadFrequencies(sourceSelect.value)
+    customSourceWrapper.classList.add('hidden')
+  }
+})
+customSourceBtn.addEventListener('click', e => {
+  useFrequencies(WordFrequencies.fromWords(customSourceText.value))
 })
 sourceSelect.value = defaultSource
 loadFrequencies(defaultSource)

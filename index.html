@@ -11,19 +11,23 @@
     <link rel="stylesheet" href="./css/main.css">
     <script src="/sheep3.js" charset="utf-8"></script>
   </head>
-  <body>
+  <body class="focus-visible">
     <div class="main">
       <div class="input-wrapper">
-        <textarea class="input" id="input" autofocus></textarea>
+        <textarea class="input focusable" id="input" autofocus></textarea>
         <div class="autocomplete-list hidden" id="autocomplete"></div>
       </div>
       <div class="sidebar">
         <label class="labelled-input">
           <span class="label">Source</span>
-          <select class="source" id="source"></select>
+          <select class="source focusable" id="source"></select>
         </label>
+        <fieldset class="custom-source hidden" id="source-wrapper">
+          <textarea class="source-text focusable" id="source-text" placeholder="Paste source text here"></textarea>
+          <button class="button focusable" id="use-source">Use</button>
+        </fieldset>
         <div class="markov-vis-wrapper" id="markov-vis"></div>
-        <button class="button" id="random">Generate randomly</button>
+        <button class="button focusable" id="random">Generate randomly</button>
       </div>
     </div>
     <script src="./bundle.js" charset="utf-8"></script>
