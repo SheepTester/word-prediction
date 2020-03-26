@@ -47,24 +47,38 @@ function listPredictions () {
     prevWordSuggestions = []
     if (prevWordRow !== undefined) {
       prevWord = currentPrevWord
+      let numberFound = false
       for (let col = 0; col < chain.cols; col++) {
         const word = wordFrequencies.words[col]
         const freq = chain.get(prevWordRow, col)
-        if (freq !== 0 && word !== NUMBER) {
-          prevWordSuggestions.push([
-            prevWord === BOUND
-              // Capitalize sentences
-              ? capitalize(word)
-              : word,
-            freq
-          ])
+        if (freq !== 0) {
+          if (word === NUMBER) {
+            numberFound = [NUMBER, freq]
+          } else {
+            prevWordSuggestions.push([
+              prevWord === BOUND
+                // Capitalize sentences
+                ? capitalize(word)
+                : word,
+              freq
+            ])
+          }
         }
       }
-      prevWordSuggestions.sort((a, b) => b[1] - a[1])
+      if (prevWordSuggestions.length === 0 && numberFound) {
+        // Prevent case where the only transition from a word is to a number
+        // which stopped random sentence generation.
+        prevWordSuggestions._number = numberFound
+      } else {
+        prevWordSuggestions.sort((a, b) => b[1] - a[1])
+      }
     }
   }
 
   autocomplete = prevWordSuggestions.filter(([word]) => word.toLowerCase().startsWith(progress.toLowerCase()))
+  if (prevWordSuggestions._number) {
+    autocomplete._number = prevWordSuggestions._number
+  }
 }
 let lastEntries
 let selected = null
@@ -250,7 +264,15 @@ function generate () {
         break
       }
     }
-    autocompleteSelected()
+    if (autocomplete.length === 0 && autocomplete._number) {
+      // This is really hacky but it works, I think
+      autocomplete.unshift(autocomplete._number)
+      setSelected(0)
+      autocompleteSelected()
+      autocomplete.shift()
+    } else {
+      autocompleteSelected()
+    }
   }
 
   if (generating) {
