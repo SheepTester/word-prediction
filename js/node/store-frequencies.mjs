@@ -7,7 +7,7 @@ import { WordFrequencies } from '../core/word-frequencies.mjs'
 // https://stackoverflow.com/a/50052194
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-const file = '../../frequencies/peter-piper.txt'
+const file = '../../frequencies/winston.txt'
 const append = false
 
 // const source = 'https://gist.github.com/The5heepDev/a15539b297a7862af4f12ce07fee6bb7/raw/7164813a9b8d0a3b2dcffd5b80005f1967887475/entire_bee_movie_script'
@@ -17,7 +17,10 @@ const append = false
 // const fromOnline = false
 
 // https://en.wikipedia.org/wiki/Peter_Piper#Lyrics
-const source = './peter-piper.txt'
+// const source = './peter-piper.txt'
+// const fromOnline = false
+
+const source = './winston.txt'
 const fromOnline = false
 
 const filePath = path.resolve(__dirname, file)
@@ -48,11 +51,13 @@ sourcePromise
     } else {
       return fs.access(filePath)
         .then(() => {
-          console.log('Given file already exists!')
+          console.log('[!] Given file already exists!')
+          return 'bad'
         })
         .catch(() => fs.writeFile(filePath, frequencies.toFile()))
     }
   })
-  .then(() => {
+  .then(response => {
+    if (response === 'bad') return
     console.log(`Text frequencies from ${source} saved to ${file}`)
   })

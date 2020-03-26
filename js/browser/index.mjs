@@ -289,7 +289,8 @@ function loadFrequencies (url) {
 
 // loadFrequencies('./frequencies/bee-movie.txt')
 // loadFrequencies('./frequencies/gatm.txt')
-loadFrequencies('./frequencies/peter-piper.txt')
+// loadFrequencies('./frequencies/peter-piper.txt')
+loadFrequencies('./frequencies/winston.txt')
 
 window.addEventListener('resize', e => {
   let doneMeasuring

@@ -1,0 +1,16 @@
+[bound]
+down
+with
+Big
+Brother
+=
+5x5
+0
+1
+0x5
+1
+0x5
+1
+0x5
+1x2
+0x4
