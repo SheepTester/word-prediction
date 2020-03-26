@@ -148,6 +148,11 @@ textarea {
   color: rgba(255, 255, 255, 0.5);
   margin-bottom: 5px;
 }
+.instruction {
+  font-size: 16px;
+  line-height: 1.5;
+  width: 300px;
+}
 
 @media (max-width: 700px) {
   body {
@@ -156,9 +161,15 @@ textarea {
   .main {
     flex-direction: column;
   }
+  .input-wrapper {
+    padding: 50px 20px;
+  }
   .input {
     height: 80vh;
     resize: vertical;
+  }
+  .instruction {
+    width: auto;
   }
 }
 

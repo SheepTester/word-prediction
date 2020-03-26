@@ -233,6 +233,7 @@ document.addEventListener('keydown', e => {
       }
     } else if (e.key === 'Tab') {
       if (!autocompleteSelected()) return
+      document.body.classList.remove('focus-visible')
     } else {
       return
     }
