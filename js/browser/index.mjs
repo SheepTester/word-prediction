@@ -137,7 +137,7 @@ function autocompleteSelected () {
       ? beforeCursor.match(getProgressWithSpacesRegex)
       : beforeCursor.match(getProgressRegex)
     if (!selection) {
-      return
+      return false
     }
     input.selectionStart = selection.index
     let insert
@@ -155,6 +155,9 @@ function autocompleteSelected () {
         insert = option + ' '
     }
     document.execCommand('insertText', false, insert)
+    return true
+  } else {
+    return false
   }
 }
 async function moveAutocomplete (then = Promise.resolve()) {
@@ -200,7 +203,7 @@ document.addEventListener('selectionchange', e => {
   }
 })
 document.addEventListener('keydown', e => {
-  if (autocomplete.length) {
+  if (autocomplete.length && document.activeElement === input) {
     if (e.key === 'ArrowDown') {
       if (selected === null) {
         setSelected(0)
@@ -214,7 +217,7 @@ document.addEventListener('keydown', e => {
         setSelected(selected - 1)
       }
     } else if (e.key === 'Tab') {
-      autocompleteSelected()
+      if (!autocompleteSelected()) return
     } else {
       return
     }
@@ -281,16 +284,35 @@ function loadFrequencies (url) {
       wordFrequencies = frequencies
       key = frequencies.makeKey()
       chain = frequencies.markovChain()
+
       renderer.setFrequencies(frequencies)
       renderer.render()
+
+      prevWord = null
+      prevWordSuggestions = []
       updateAutocomplete()
     })
 }
 
-// loadFrequencies('./frequencies/bee-movie.txt')
-// loadFrequencies('./frequencies/gatm.txt')
-// loadFrequencies('./frequencies/peter-piper.txt')
-loadFrequencies('./frequencies/winston.txt')
+const sources = [
+  { url: './frequencies/peter-piper.txt', name: 'Peter Piper' },
+  { url: './frequencies/winston.txt', name: 'Down with Big Brother' },
+  { url: './frequencies/bee-movie.txt', name: 'Bee Movie' },
+  { url: './frequencies/gatm.txt', name: 'A Geometric Approach to Matrices' }
+]
+const defaultSource = './frequencies/bee-movie.txt'
+const sourceSelect = document.getElementById('source')
+for (const { url, name } of sources) {
+  const option = document.createElement('option')
+  option.value = url
+  option.textContent = name
+  sourceSelect.appendChild(option)
+}
+sourceSelect.addEventListener('change', e => {
+  loadFrequencies(sourceSelect.value)
+})
+sourceSelect.value = defaultSource
+loadFrequencies(defaultSource)
 
 window.addEventListener('resize', e => {
   let doneMeasuring
