@@ -51,13 +51,15 @@ export class WordMarkovChain {
   toFile () {
     return JSON.stringify({
       order: this.order,
-      data: this._data
+      data: Object.fromEntries(Array.from(this._data, ([tuple, frequencies]) =>
+        [tuple, Object.fromEntries(frequencies)]))
     }, null, 2)
   }
 
   static fromFile (file) {
     const { order, data } = JSON.parse(file)
-    return new WordMarkovChain(order, data)
+    return new WordMarkovChain(order, new Map(Object.entries(data)
+      .map(([tuple, frequencies]) => [tuple, new Map(Object.entries(frequencies))])))
   }
 
   static fromWords (text, target) {
@@ -66,6 +68,8 @@ export class WordMarkovChain {
     } else if (!target) {
       target = new WordMarkovChain()
     }
+    // Private access ok within class I believe
+    const { _data: chain, order } = target
     const words = [BOUND]
       .concat(...preferredCase(digest(text))
         .map(arr => [...arr, BOUND]))
@@ -78,10 +82,10 @@ export class WordMarkovChain {
     for (let i = 0; i < words.length - order; i++) {
       const tuple = words.slice(i, i + order).join(SEP)
       const word = words[i + order]
-      let freqMap = target._data.get(tuple)
+      let freqMap = chain.get(tuple)
       if (!freqMap) {
         freqMap = new Map()
-        target._data.set(tuple, freqMap)
+        chain.set(tuple, freqMap)
       }
       freqMap.set(word, (freqMap.get(word) || 0) + 1)
     }
