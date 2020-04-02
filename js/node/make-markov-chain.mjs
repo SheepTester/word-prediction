@@ -10,25 +10,23 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 
 async function storeIn (source, fromOnline, outputFile, order) {
   const filePath = path.resolve(__dirname, outputFile)
-  // 'wx' - Open file for (w)riting; fails if file e(x)ists
-  let outputFileHandle = await fs.open(filePath, 'wx')
-    .catch(() => null)
+  const outputFileExists = fs.access(filePath)
+    .then(() => true)
+    .catch(() => false)
   let target = order
-  if (!outputFileHandle) {
+  if (await outputFileExists) {
     const rl = readline.createInterface({
       input: process.stdin,
       output: process.stdout
     })
     const answer = await new Promise(resolve => {
-      rl.question(`Output file (${outputFile}) already exists. Append? `, resolve)
+      rl.question(`Output file (${outputFile}) already exists. Append? (y/n) `, resolve)
     })
     rl.close()
     if (answer[0].toLowerCase() !== 'y') {
       throw new Error(`Output file (${outputFile}) already exists.`)
     } else {
-      // 'w+' - Open file for (w)riting (+) reading
-      outputFileHandle = await fs.open(filePath, 'w+')
-      target = WordMarkovChain.fromFile(await outputFileHandle.readFile({ encoding: 'utf8' }))
+      target = WordMarkovChain.fromFile(await fs.readFile(filePath, 'utf8'))
     }
   }
   let text
@@ -39,8 +37,7 @@ async function storeIn (source, fromOnline, outputFile, order) {
     text = await fs.readFile(path.resolve(__dirname, source), 'utf8')
   }
   const chain = WordMarkovChain.fromWords(text, target)
-  await outputFileHandle.writeFile(chain.toFile())
-  await outputFileHandle.close()
+  await fs.writeFile(filePath, chain.toFile())
 }
 
 storeIn(
