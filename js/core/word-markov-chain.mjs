@@ -11,15 +11,22 @@ export class WordMarkovChain {
     this._data = data
   }
 
-  // Use spread operator to clone array lol
-  _getTuple (...words) {
-    while (words.length < order) {
-      words.unshift(BOUND)
-    }
-    return words.join(SEP)
-  }
-
   getFrequencies (words, normalize = true) {
+    let freqMap
+    if (words.length < this.order) {
+      // Assume the rest of the words are wildcards
+      const end = SEP + words.join(SEP)
+      freqMap = new Map()
+      for (const [tuple, frequencies] of this._data) {
+        if (tuple.endsWith(end)) {
+          for (const [word, frequency] of frequencies) {
+            freqMap.set(word, (freqMap.get(word) || 0) + frequency)
+          }
+        }
+      }
+    } else {
+      freqMap = this._data.get(words.join(SEP))
+    }
     const tuple = this._getTuple(words)
     const freqMap = this._data.get(tuple)
     if (freqMap) {
